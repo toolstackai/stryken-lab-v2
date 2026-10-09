@@ -1,0 +1,142 @@
+/* ================= LAB: cinemáticas, mochila y gunsmith ================= */
+#lobby { transition: opacity 0.45s, transform 0.45s; }
+#lobby.cine-hide { opacity: 0; pointer-events: none; transform: scale(1.04); }
+#lobby.cine-hide > * { pointer-events: none; }
+#cine-fade { position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0; background: #07090d; }
+#cine-fade.white { background: #fff8ec; }
+#letterbox-t, #letterbox-b { position: fixed; left: 0; right: 0; height: 0; background: #000; z-index: 39; transition: height 0.55s cubic-bezier(.2, .8, .2, 1); pointer-events: none; }
+#letterbox-t { top: 0; } #letterbox-b { bottom: 0; }
+body.letterbox-on #letterbox-t, body.letterbox-on #letterbox-b { height: 8vh; }
+
+/* paneles acoplados a la derecha: la cámara del lobby sigue viéndose a la izquierda */
+.backdrop.docked { background: linear-gradient(90deg, transparent 30%, rgba(5, 8, 14, 0.55)); backdrop-filter: none; justify-content: flex-end; padding-right: 3vw; }
+.backdrop.docked .panel { width: min(640px, 52vw) !important; max-height: 84vh; animation: slidein 0.5s cubic-bezier(.2, .8, .2, 1); background: linear-gradient(180deg, rgba(34, 42, 61, 0.92), rgba(24, 30, 44, 0.94)); backdrop-filter: blur(6px); }
+@keyframes slidein { from { transform: translateX(80px); opacity: 0; } }
+
+/* ---------- Mochila (interior) ---------- */
+#bag { position: fixed; inset: 0; z-index: 25; display: flex; flex-direction: column; padding: 4vh 4vw;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(255, 210, 140, 0.2), transparent 60%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.12) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #3b3a2c, #1f1f17);
+  animation: bagin 0.75s cubic-bezier(.2, .8, .2, 1); }
+#bag.out { animation: bagout 0.45s ease-in forwards; }
+@keyframes bagin { from { transform: scale(1.4); opacity: 0; filter: blur(14px); } }
+@keyframes bagout { to { transform: scale(1.3); opacity: 0; filter: blur(10px); } }
+#bag .stitch { position: absolute; inset: 2.6vh 2vw; border: 2px dashed rgba(255, 240, 200, 0.18); border-radius: 18px; pointer-events: none; }
+#bag .zip { position: absolute; left: 0; right: 0; top: 0; height: 22px; background: repeating-linear-gradient(90deg, #9a9a90 0 6px, #4a4a42 6px 10px); box-shadow: 0 3px 8px rgba(0, 0, 0, .6); }
+#bag .zip i { position: absolute; top: -4px; width: 26px; height: 40px; background: linear-gradient(180deg, #c9c9bd, #6d6d64); border-radius: 4px; animation: zipper 0.75s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes zipper { from { left: 50%; } to { left: 96%; } }
+.bag-head { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 14px; position: relative; z-index: 1; }
+.bag-head h1 { font-size: 64px; font-weight: 900; font-style: italic; line-height: .9; color: #f4ead2; text-shadow: 0 4px 0 rgba(0, 0, 0, .4); }
+.bag-head h1 small { display: block; font-size: 15px; font-style: normal; letter-spacing: 5px; color: #d8b56a; font-weight: 700; }
+.bag-close { font-size: 20px; font-weight: 800; color: #f4ead2; border: 2px solid rgba(244, 234, 210, 0.5); padding: 8px 20px; border-radius: 4px; transition: background .2s; }
+.bag-close:hover { background: rgba(244, 234, 210, 0.15); }
+.bag-tabs { display: flex; gap: 10px; margin: 18px 0 14px; position: relative; z-index: 1; }
+.bag-tabs button { font-size: 20px; font-weight: 800; padding: 8px 18px; color: #d9cfb6; background: rgba(0, 0, 0, .25); border-radius: 6px 6px 0 0; border-bottom: 3px solid transparent; transition: all .2s; }
+.bag-tabs button.on { color: #fff; background: rgba(0, 0, 0, .45); border-bottom-color: #d8b56a; }
+.bag-body { flex: 1; overflow-y: auto; position: relative; z-index: 1; padding: 6px; }
+.bag-body .item { background: linear-gradient(180deg, rgba(60, 58, 44, .95), rgba(40, 39, 30, .95)); border: 1px solid rgba(255, 240, 200, .15); border-radius: 8px; box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .25), 0 6px 14px rgba(0, 0, 0, .35); animation: pocketin .5s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes pocketin { from { transform: translateY(26px) scale(.94); opacity: 0; } }
+.bag-loadouts { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.bl-card { position: relative; background: linear-gradient(180deg, rgba(60, 58, 44, .95), rgba(36, 35, 27, .95)); border: 1px solid rgba(255, 240, 200, .15); border-radius: 10px; padding: 12px 14px; box-shadow: 0 8px 18px rgba(0, 0, 0, .4), inset 0 0 0 2px rgba(0, 0, 0, .2); animation: pocketin .5s cubic-bezier(.2, .8, .2, 1) both; }
+.bl-card.on { border-color: #d8b56a; box-shadow: 0 0 0 1px #d8b56a, 0 8px 18px rgba(0, 0, 0, .4); }
+.bl-card h3 { font-size: 18px; font-weight: 800; color: #f4ead2; display: flex; justify-content: space-between; align-items: center; }
+.bl-card h3 button { font-size: 13px; color: #d8b56a; font-weight: 800; }
+.bl-slot { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 6px 8px; border-radius: 6px; background: rgba(0, 0, 0, .25); cursor: pointer; transition: background .2s, transform .2s; }
+.bl-slot:hover { background: rgba(216, 181, 106, .18); transform: translateX(4px); }
+.bl-slot img { width: 150px; height: 52px; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .5)); }
+.bl-slot div small { display: block; font-size: 12px; color: #bfb391; font-weight: 700; letter-spacing: 1px; }
+.bl-slot div b { font-size: 18px; color: #fff; }
+.bl-slot .edit { margin-left: auto; font-size: 13px; color: #d8b56a; font-weight: 800; opacity: 0; transition: opacity .2s; }
+.bl-slot:hover .edit { opacity: 1; }
+
+/* ---------- Gunsmith ---------- */
+#gunsmith { position: fixed; inset: 0; z-index: 26; pointer-events: none; font-family: var(--cond); }
+#gunsmith .gs-top, #gunsmith .gs-list, #gunsmith .gs-stats, #gunsmith .gs-drawer { pointer-events: auto; }
+#gunsmith.in .gs-top, #gunsmith.in .gs-list, #gunsmith.in .gs-stats { animation: gsin .7s cubic-bezier(.2, .8, .2, 1) both; }
+#gunsmith.in .gs-list { animation-delay: .2s; } #gunsmith.in .gs-stats { animation-delay: .3s; }
+@keyframes gsin { from { opacity: 0; transform: translateY(18px); } }
+.gs-top { position: absolute; left: 3vw; top: 3vh; display: flex; align-items: center; gap: 18px; }
+.gs-top h1 { font-size: 46px; font-weight: 900; font-style: italic; letter-spacing: 1px; line-height: .9; }
+.gs-top small { font-size: 14px; letter-spacing: 3px; color: var(--cyan); font-weight: 700; }
+.gs-back { font-size: 18px; font-weight: 800; padding: 8px 16px; border: 1px solid rgba(255, 255, 255, .35); background: rgba(10, 14, 22, .5); transition: background .2s; }
+.gs-back:hover { background: rgba(47, 198, 216, .2); }
+.gs-list { position: absolute; left: 3vw; top: 15vh; width: 250px; max-height: 70vh; overflow-y: auto; transition: opacity .35s, transform .35s; }
+#gunsmith.exploded .gs-list { opacity: 0; transform: translateX(-30px); pointer-events: none; }
+.gs-cat { font-size: 13px; letter-spacing: 3px; color: var(--muted); font-weight: 700; margin: 12px 0 4px; }
+.gs-item { position: relative; display: block; width: 100%; text-align: left; padding: 8px 14px; font-size: 20px; font-weight: 700; color: #cfd6e2; background: linear-gradient(90deg, rgba(255, 255, 255, .04), transparent); border-left: 3px solid transparent; margin-bottom: 3px; overflow: hidden; transition: color .15s, padding .2s, border-color .2s, background .2s; }
+.gs-item:hover, .gs-item.peek { color: #fff; padding-left: 20px; background: linear-gradient(90deg, rgba(47, 198, 216, .2), transparent); border-left-color: var(--cyan); }
+.gs-item.on { color: var(--yellow); border-left-color: var(--yellow); background: linear-gradient(90deg, rgba(242, 194, 48, .18), transparent); }
+.gs-item.on::after { content: 'EQUIPPED'; position: absolute; right: 8px; top: 12px; font-size: 11px; letter-spacing: 1px; color: var(--yellow); }
+.gs-stats { position: absolute; right: 3vw; top: 15vh; width: 290px; background: rgba(10, 14, 22, .55); border: 1px solid rgba(255, 255, 255, .08); padding: 14px 16px; backdrop-filter: blur(4px); }
+.gs-stitle { font-size: 14px; letter-spacing: 3px; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+.gs-stat { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; margin-bottom: 9px; font-size: 15px; font-weight: 700; }
+.gs-stat b { font-size: 15px; }
+.gs-bar { grid-column: 1 / 3; position: relative; height: 5px; background: rgba(255, 255, 255, .12); }
+.gs-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: #e8ecf4; transition: width .35s cubic-bezier(.2, .8, .2, 1); }
+.gs-bar em { position: absolute; top: 0; bottom: 0; transition: left .35s, width .35s cubic-bezier(.2, .8, .2, 1); }
+.gs-bar em.up { background: #4ee07a; } .gs-bar em.down { background: #ff4b4b; }
+.gs-dps { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 8px; }
+.gs-dps small { letter-spacing: 3px; color: var(--muted); font-weight: 700; } .gs-dps b { font-size: 30px; color: var(--cyan); }
+.gs-name { position: absolute; left: 50%; bottom: 13vh; transform: translateX(-50%); text-align: center; transition: opacity .3s; pointer-events: none; }
+.gs-name small { display: block; font-size: 14px; letter-spacing: 6px; color: var(--cyan); font-weight: 700; }
+.gs-name b { font-size: 54px; font-weight: 900; font-style: italic; text-shadow: 0 4px 0 rgba(0, 0, 0, .4); }
+#gunsmith.exploded .gs-name { opacity: 0; }
+.gs-hint { position: absolute; left: 50%; bottom: 6vh; transform: translateX(-50%); font-size: 14px; letter-spacing: 3px; color: rgba(255, 255, 255, .65); font-weight: 700; animation: blink 2.4s infinite; pointer-events: none; white-space: nowrap; }
+#gunsmith.exploded .gs-hint { bottom: 1.2vh; }
+.gs-lines { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .4s .25s; pointer-events: none; }
+#gunsmith.exploded .gs-lines { opacity: 1; }
+.gs-lines path { fill: none; stroke: rgba(255, 255, 255, .45); stroke-width: 1.2; }
+.gs-lines path.on { stroke: var(--yellow); stroke-width: 2; }
+.gs-lines circle { fill: #fff; } .gs-lines circle.on { fill: var(--yellow); }
+.gs-labels { position: absolute; inset: 0; pointer-events: none; }
+.gs-label { pointer-events: auto; position: absolute; width: 160px; text-align: left; padding: 6px 10px; background: rgba(10, 14, 22, .8); border-left: 3px solid rgba(255, 255, 255, .4); backdrop-filter: blur(4px); animation: lbin .45s cubic-bezier(.2, .8, .2, 1) both; transition: border-color .2s, background .2s, transform .2s; }
+.gs-label small { display: block; font-size: 11px; letter-spacing: 2px; color: var(--muted); font-weight: 700; }
+.gs-label b { font-size: 16px; font-weight: 800; }
+.gs-label.mod { border-left-color: var(--cyan); } .gs-label.mod b { color: var(--cyan); }
+.gs-label:hover, .gs-label.on { border-left-color: var(--yellow); background: rgba(40, 34, 10, .88); transform: scale(1.05); }
+@keyframes lbin { from { opacity: 0; transform: translateX(-12px); } }
+.gs-drawer { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 110%); width: min(980px, 94vw); background: linear-gradient(180deg, rgba(14, 18, 28, .92), rgba(8, 10, 16, .97)); border-top: 2px solid var(--yellow); padding: 12px 16px 30px; transition: transform .45s cubic-bezier(.2, .8, .2, 1); }
+.gs-drawer.on { transform: translate(-50%, 0); }
+.gs-dtitle { font-size: 14px; letter-spacing: 4px; color: var(--yellow); font-weight: 800; margin-bottom: 8px; }
+.gs-opts { display: flex; gap: 10px; overflow-x: auto; }
+.gs-opt { min-width: 190px; text-align: left; padding: 10px 12px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1); animation: lbin .35s both; transition: border-color .2s, background .2s, transform .2s; }
+.gs-opt:hover { transform: translateY(-3px); border-color: rgba(255, 255, 255, .4); }
+.gs-opt.on { border-color: var(--cyan); background: rgba(47, 198, 216, .14); }
+.gs-opt b { font-size: 18px; font-weight: 800; display: block; margin-bottom: 4px; }
+.gs-pros span { display: block; font-size: 12px; font-weight: 700; letter-spacing: .5px; }
+.gs-pros .up { color: #4ee07a; } .gs-pros .down { color: #ff6b6b; } .gs-pros .flat { color: var(--muted); }
+.gs-flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(47, 198, 216, .35), transparent 55%); opacity: 0; pointer-events: none; }
+.gs-flash.go { animation: gsflash .45s ease-out; }
+@keyframes gsflash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+#bag.over { z-index: 30; background: linear-gradient(180deg, rgba(40, 38, 28, 0.93), rgba(24, 23, 17, 0.96)); backdrop-filter: blur(6px); animation: slideup .5s cubic-bezier(.2, .8, .2, 1); }
+@keyframes slideup { from { transform: translateY(60px); opacity: 0; } }
+#cine-skip { position: fixed; right: 3vw; bottom: 10vh; z-index: 41; font-family: var(--cond); font-size: 16px; font-weight: 800; letter-spacing: 2px; color: rgba(255, 255, 255, .75); opacity: 0; transition: opacity .3s; pointer-events: none; }
+#cine-skip.on { opacity: 1; }
+.gs-tabs { position: absolute; left: 50%; top: 3.5vh; transform: translateX(-50%); display: none; gap: 6px; pointer-events: auto; }
+#gunsmith.bench .gs-tabs { display: flex; }
+#gunsmith.exploded .gs-tabs { opacity: 0; pointer-events: none; }
+.gs-tab { font-size: 18px; font-weight: 800; letter-spacing: 1px; padding: 8px 18px; color: #d9cfb6; background: rgba(0, 0, 0, .35); border-bottom: 3px solid transparent; transition: all .2s; }
+.gs-tab:hover { color: #fff; background: rgba(0, 0, 0, .55); }
+.gs-tab.on { color: #fff; border-bottom-color: #d8b56a; }
+#gunsmith.bench .gs-top small { color: #d8b56a; }
+.gs-lo small { display: block; font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .5px; }
+.gs-lo.on small { color: #e8d49a; }
+.gs-slots { display: flex; gap: 6px; }
+.gs-slots button { flex: 1; padding: 7px; font-size: 15px; font-weight: 800; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12); }
+.gs-slots button.on { border-color: var(--yellow); color: var(--yellow); }
+
+.gs-list::-webkit-scrollbar { width: 4px; } .gs-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .25); }
+
+.gs-label { width: 170px; height: 50px; }
+.gs-stats { transition: opacity .35s, transform .35s, top .45s; }
+#gunsmith.exploded .gs-stats { opacity: 0; transform: translateX(30px); pointer-events: none; }
+
+#gunsmith.exploded.drawer .gs-labels .gs-label:not(.on) { opacity: .55; }
+
+.gs-dstats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px 14px; margin-bottom: 10px; }
+.gs-dstats .gs-stat { margin: 0; font-size: 12px; }
+.gs-dstats .gs-stat b.up { color: #4ee07a; } .gs-dstats .gs-stat b.down { color: #ff6b6b; }

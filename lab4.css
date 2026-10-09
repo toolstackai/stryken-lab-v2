@@ -1,0 +1,128 @@
+/* ================= LAB · SECUENCIA 4: muerte, killcam y redespliegue ================= */
+#dk-ui { position: fixed; inset: 0; z-index: 20; pointer-events: none; font-family: var(--cond); overflow: hidden; }
+#dk-ui > * { position: absolute; }
+
+/* el HUD se retira mientras estás muerto (quedan killfeed, chat y marcador) */
+body.dk-on #hud > :not(.killfeed):not(.chat):not(.scoreboard):not(#tags) { opacity: 0 !important; transition: opacity .25s; }
+body.dk-on #hud #tags { opacity: 0; }
+
+/* color del mundo según la fase */
+#c { transition: filter .5s ease-out; }
+body.dk-dead #c { filter: saturate(.18) brightness(.82) contrast(1.12); transition: filter .9s ease-out; }
+body.dk-kc #c { filter: saturate(.9) contrast(1.1) sepia(.12) brightness(.96); transition: none; }
+body.dk-deploying #c { filter: saturate(.55) contrast(1.15) brightness(1.08) hue-rotate(-8deg); transition: none; }
+body.dk-land::after { content: ''; position: fixed; inset: 0; z-index: 21; pointer-events: none; background: radial-gradient(circle, rgba(220, 250, 255, .85), rgba(63, 224, 255, .25) 60%, transparent); animation: dkLand .55s ease-out forwards; }
+@keyframes dkLand { from { opacity: 1; } to { opacity: 0; } }
+
+/* ---------- caída ---------- */
+.dk-blood { inset: 0; background:
+    radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(120, 0, 0, .55) 85%, rgba(60, 0, 0, .85)),
+    radial-gradient(circle at 12% 88%, rgba(150, 0, 0, .55), transparent 28%),
+    radial-gradient(circle at 92% 14%, rgba(150, 0, 0, .4), transparent 22%);
+  opacity: 0; animation: dkBlood 1.2s ease-out forwards; }
+@keyframes dkBlood { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: .75; } }
+#dk-ui.dks-kc .dk-blood, #dk-ui.dks-deploy .dk-blood { opacity: 0; animation: none; transition: opacity .3s; }
+
+/* ---------- tarjeta del asesino ---------- */
+.dk-bottom { left: 50%; bottom: 9vh; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; transition: opacity .3s, transform .3s; }
+#dk-ui.dks-kc .dk-bottom { left: 3vw; bottom: 4vh; transform: scale(.78); transform-origin: bottom left; align-items: flex-start; }
+#dk-ui.dks-kc .dk-stats { display: none; }
+body.dk-kc #hud .chat, body.dk-deploying #hud .chat { opacity: 0; }
+#dk-ui.dks-deploy .dk-bottom, #dk-ui.dks-deploy .dk-hint { opacity: 0; }
+.dk-card { position: relative; display: flex; align-items: center; gap: 16px; min-width: min(520px, 92vw); padding: 12px 22px 16px 14px; overflow: hidden;
+  border-left: 5px solid var(--red); box-shadow: 0 18px 50px rgba(0, 0, 0, .55); clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+  animation: dkCard .55s cubic-bezier(.2, 1.2, .3, 1) .25s both; }
+.dk-card::after { content: ''; position: absolute; top: 0; bottom: 0; width: 70px; left: -90px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent); animation: dkShine 2.6s .9s infinite; }
+@keyframes dkShine { 0%, 60% { left: -90px; } 100% { left: 110%; } }
+@keyframes dkCard { from { opacity: 0; transform: translateY(40px) skewX(-8deg); } }
+.dk-card.kia { min-width: 360px; border-left-color: #8a93a6; background: linear-gradient(180deg, rgba(26, 30, 44, .96), rgba(12, 14, 22, .97)); }
+.dk-emblem { width: 64px; height: 64px; flex: none; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .6)); animation: dkEmb .7s cubic-bezier(.2, 1.5, .4, 1) .45s both; }
+.dk-emblem svg { width: 100%; height: 100%; }
+@keyframes dkEmb { from { opacity: 0; transform: scale(.3) rotate(-30deg); } }
+.dk-who { display: flex; flex-direction: column; line-height: 1; flex: 1; min-width: 0; }
+.dk-who small { font-size: 13px; letter-spacing: 4px; color: #ff8a8a; font-weight: 800; }
+.dk-who b { font-size: 36px; font-weight: 900; font-style: italic; color: #fff; margin: 3px 0 4px; text-shadow: 0 3px 0 rgba(0, 0, 0, .4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-card.kia .dk-who b { font-size: 28px; }
+.dk-who span { font-size: 13px; letter-spacing: 2px; color: #cfd6e2; font-weight: 700; }
+.dk-who em { color: var(--yellow); font-style: normal; }
+.dk-gun { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-left: 14px; border-left: 1px solid rgba(255, 255, 255, .15); }
+.dk-gun img { height: 38px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); }
+.dk-gun span { font-size: 13px; letter-spacing: 2px; font-weight: 800; color: #e8ecf4; }
+.dk-head { position: absolute; right: 26px; top: 6px; font-size: 11px; letter-spacing: 3px; font-weight: 900; color: #1a1205; background: var(--yellow); padding: 2px 8px; transform: skewX(-12deg); animation: dkPop .4s cubic-bezier(.2, 1.6, .4, 1) .8s both; }
+@keyframes dkPop { from { opacity: 0; transform: skewX(-12deg) scale(2); } }
+.dk-hp { position: absolute; left: 0; right: 16px; bottom: 0; height: 4px; background: rgba(255, 255, 255, .08); }
+.dk-hp i { display: block; height: 100%; background: linear-gradient(90deg, #ff4a4a, #ff9b6a); box-shadow: 0 0 8px rgba(255, 74, 74, .7); transform-origin: left; animation: dkBar .8s cubic-bezier(.2, 1, .3, 1) .7s both; }
+@keyframes dkBar { from { transform: scaleX(0); } }
+.dk-stats { display: flex; gap: 6px; }
+.dk-stats > div { display: flex; flex-direction: column; align-items: center; min-width: 104px; padding: 6px 10px; background: rgba(12, 15, 24, .78); border-top: 2px solid rgba(255, 255, 255, .14); animation: fadeup .45s both; }
+.dk-stats b { font-size: 26px; font-weight: 900; line-height: 1; color: #fff; }
+.dk-stats b.red { color: #ff6b6b; }
+.dk-stats b i { font-size: 15px; font-style: normal; color: #9aa4b5; margin-left: 1px; }
+.dk-stats small { font-size: 11px; letter-spacing: 2px; color: #9aa4b5; font-weight: 700; }
+.dk-rev { display: flex; align-items: center; gap: 8px; font-size: 13px; letter-spacing: 3px; font-weight: 800; color: #ffb36b; animation: fadeup .45s 1s both; }
+.dk-rev i { width: 10px; height: 10px; transform: rotate(45deg); background: #ff7a3d; box-shadow: 0 0 8px #ff7a3d; animation: blink 1s infinite; }
+#dk-ui.dks-kc .dk-rev { display: none; }
+
+.dk-hint { left: 50%; bottom: 3vh; transform: translateX(-50%); display: flex; gap: 22px; font-size: 14px; letter-spacing: 2px; font-weight: 700; color: #cfd6e2; text-shadow: 0 2px 4px #000; animation: dkFadeC .5s 1s both; transition: opacity .3s; white-space: nowrap; }
+.dk-hint kbd { font-family: var(--cond); font-size: 12px; color: #fff; display: inline-block; min-width: 0; height: auto; line-height: 1.4; box-shadow: none; padding: 1px 7px; margin-right: 4px; border: 1px solid rgba(255, 255, 255, .5); border-radius: 3px; background: rgba(0, 0, 0, .35); }
+#dk-ui.dks-kc .dk-hint { left: auto; right: 3vw; bottom: 4vh; transform: none; animation: none; }
+
+/* ---------- entrada a la killcam: rebobinado ---------- */
+.dk-slam { left: 50%; top: 42%; transform: translate(-50%, -50%); display: none; align-items: center; gap: 14px; color: #fff; }
+.dk-slam b { font-size: clamp(54px, 9vw, 110px); font-weight: 900; font-style: italic; letter-spacing: 4px; text-shadow: 3px 0 rgba(255, 40, 60, .8), -3px 0 rgba(40, 220, 255, .8), 0 6px 0 rgba(0, 0, 0, .4); }
+.dk-slam i { font-size: 46px; font-style: normal; color: #ff3b4e; animation: blink .25s infinite; }
+#dk-ui.dks-kcIn .dk-slam { display: flex; animation: dkSlam .42s cubic-bezier(.2, 1.4, .4, 1) both; }
+@keyframes dkSlam { 0% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); filter: blur(6px); } 40% { opacity: 1; transform: translate(-50%, -50%) scale(.96); filter: blur(0); } 100% { transform: translate(-50%, -50%) scale(1); } }
+#dk-ui.dks-kcIn::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .08) 0 2px, transparent 2px 5px); animation: dkVhs .42s linear both; }
+#dk-ui.dks-kcIn::after { content: ''; position: absolute; left: 0; right: 0; height: 18%; background: rgba(255, 255, 255, .14); mix-blend-mode: overlay; animation: dkTear .21s linear 2; }
+@keyframes dkVhs { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: .2; } }
+@keyframes dkTear { from { top: 110%; } to { top: -20%; } }
+
+/* ---------- killcam ---------- */
+.dk-grain { inset: -50%; opacity: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); mix-blend-mode: overlay; }
+#dk-ui.dks-kc .dk-grain { opacity: .5; animation: dkGrain .5s steps(4) infinite; }
+@keyframes dkGrain { 0% { transform: translate(0, 0); } 25% { transform: translate(-3%, 2%); } 50% { transform: translate(2%, -3%); } 75% { transform: translate(-2%, -1%); } }
+#dk-ui.dks-kc { background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .55)); }
+.dk-rec { left: 50%; top: 3.5vh; transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: 8px; }
+#dk-ui.dks-kc .dk-rec { display: flex; animation: dkFadeC .35s both; }
+@keyframes dkFadeC { from { opacity: 0; transform: translate(-50%, 14px); } }
+.dk-rec span { display: flex; align-items: center; gap: 10px; font-size: 34px; font-weight: 900; font-style: italic; letter-spacing: 3px; color: #fff; text-shadow: 0 3px 0 rgba(0, 0, 0, .45); }
+.dk-rec span i { width: 14px; height: 14px; border-radius: 50%; background: #ff2e43; box-shadow: 0 0 10px #ff2e43; animation: blink 1s infinite; }
+.dk-tl { position: relative; width: 240px; height: 4px; background: rgba(255, 255, 255, .2); }
+.dk-tl > i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #fff; }
+.dk-tl > b { position: absolute; top: -4px; width: 3px; height: 12px; margin-left: -1px; background: #ff2e43; box-shadow: 0 0 6px #ff2e43; }
+.dk-slow { left: 50%; top: calc(3.5vh + 66px); transform: translateX(-50%); white-space: nowrap; font-size: 18px; font-weight: 900; font-style: italic; letter-spacing: 6px; color: var(--yellow); text-shadow: 0 2px 6px rgba(0, 0, 0, .7); opacity: 0; transition: opacity .2s; }
+#dk-ui.dk-slowmo .dk-slow { opacity: 1; animation: blink .8s infinite; }
+#dk-ui.dk-hit::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255, 255, 255, .25), rgba(255, 40, 40, .35) 70%); animation: ubFlash .45s ease-out forwards; }
+#dk-ui.dks-kc .dk-skip kbd { border-color: #fff; }
+
+/* ---------- redespliegue: vista táctica ---------- */
+.dk-dep { inset: 0; display: none; }
+#dk-ui.dks-deploy .dk-dep { display: block; }
+.dk-dep > * { position: absolute; }
+.dk-grid { inset: 0; background:
+    linear-gradient(rgba(63, 224, 255, .12) 1px, transparent 1px) 0 0 / 60px 60px,
+    linear-gradient(90deg, rgba(63, 224, 255, .12) 1px, transparent 1px) 0 0 / 60px 60px,
+    radial-gradient(ellipse at center, rgba(63, 224, 255, .08), rgba(4, 20, 30, .55) 85%);
+  animation: dkGrid 1.05s ease-in forwards; }
+@keyframes dkGrid { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: .8; } 100% { opacity: 0; } }
+.dk-scan { left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #3fe0ff, transparent); box-shadow: 0 0 18px #3fe0ff; animation: dkScan 1.05s linear forwards; }
+@keyframes dkScan { from { top: 0; opacity: 1; } to { top: 100%; opacity: .2; } }
+.dk-dtitle { left: 4vw; top: 6vh; display: flex; flex-direction: column; line-height: 1; animation: fadeup .3s both; }
+.dk-dtitle small { font-size: 14px; letter-spacing: 6px; font-weight: 800; color: var(--cyan); }
+.dk-dtitle b { font-size: 44px; font-weight: 900; font-style: italic; color: #fff; text-shadow: 0 3px 0 rgba(0, 0, 0, .4); }
+.dk-alt { position: absolute; right: 4vw; top: 6vh; font-size: 16px; letter-spacing: 3px; font-weight: 800; color: var(--cyan); }
+.dk-alt b { font-size: 40px; color: #fff; font-style: italic; margin: 0 4px; }
+.dk-reticle { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border: 2px solid rgba(63, 224, 255, .8); border-radius: 50%; animation: dkRet 1.05s cubic-bezier(.5, 0, .9, .4) forwards; }
+.dk-reticle::before, .dk-reticle::after { content: ''; position: absolute; left: 50%; top: 50%; background: #3fe0ff; }
+.dk-reticle::before { width: 2px; height: 160%; margin: -80% 0 0 -1px; background: linear-gradient(transparent, #3fe0ff 30%, transparent 40%, transparent 60%, #3fe0ff 70%, transparent); }
+.dk-reticle::after { height: 2px; width: 160%; margin: -1px 0 0 -80%; background: linear-gradient(90deg, transparent, #3fe0ff 30%, transparent 40%, transparent 60%, #3fe0ff 70%, transparent); }
+@keyframes dkRet { 0% { transform: scale(2.2) rotate(-40deg); opacity: 0; } 25% { opacity: 1; } 100% { transform: scale(.35) rotate(0); opacity: 0; } }
+
+@media (max-width: 700px) {
+  .dk-card { min-width: 0; width: 92vw; }
+  .dk-who b { font-size: 26px; }
+  .dk-gun { display: none; }
+  .dk-stats > div { min-width: 0; flex: 1; }
+  .dk-hint { gap: 12px; font-size: 12px; }
+}

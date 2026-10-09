@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STRYKEN LAB V2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="lab.css">
+<link rel="stylesheet" href="lab2.css">
+<link rel="stylesheet" href="lab3.css">
+<link rel="stylesheet" href="lab4.css">
+<link rel="stylesheet" href="lab5.css">
+<link rel="stylesheet" href="lab6.css">
+<link rel="stylesheet" href="lab7.css">
+<link rel="stylesheet" href="lab8.css">
+<link rel="stylesheet" href="lab9.css">
+<link rel="stylesheet" href="v2.css">
+<link rel="stylesheet" href="v2-arena.css">
+<link rel="stylesheet" href="v2-cine.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2312224a'/%3E%3Cpath d='M9 22c6 2 13 0 13-4s-11-3-11-7 6-5 11-3' stroke='white' stroke-width='3.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- ========== SPLASH ========== -->
+<div id="splash">
+  <div class="sp-grid"></div>
+  <div class="sp-logo">
+    <div class="logo big sp-ghost"><span class="logo-s">S</span><span>TRYKEN</span><svg class="logo-bullet" viewBox="0 0 40 20"><path d="M2 6h22c8 0 14 2 14 4s-6 4-14 4H2z" fill="#fff"/><rect x="0" y="5" width="7" height="10" rx="1" fill="#c9d3e6"/></svg></div>
+    <div class="logo big sp-fillogo" id="sp-fillogo"><span class="logo-s">S</span><span>TRYKEN</span><svg class="logo-bullet" viewBox="0 0 40 20"><path d="M2 6h22c8 0 14 2 14 4s-6 4-14 4H2z" fill="#fff"/><rect x="0" y="5" width="7" height="10" rx="1" fill="#c9d3e6"/></svg></div>
+  </div>
+  <div class="splash-bar"><div id="splash-fill"></div></div>
+  <div class="sp-row"><div id="splash-msg">LOADING...</div><div id="sp-pct">0%</div></div>
+</div>
+
+<!-- ========== LOBBY ========== -->
+<div id="lobby" class="hidden">
+  <nav class="topnav">
+    <button data-nav="play" class="active">PLAY</button>
+    <button data-nav="inventory">INVENTORY<i class="dot"></i></button>
+    <button data-nav="store">STORE<i class="dot"></i></button>
+    <button data-nav="profile">PROFILE</button>
+    <button data-nav="center">CENTER</button>
+  </nav>
+  <button class="gear" id="btn-settings" title="Settings"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.7 7.7 0 0 0 1.7 1L11 21h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button>
+  <div class="wallet">
+    <span class="cur coin"><i></i><b id="w-coins">0</b></span>
+    <span class="cur shard"><i></i><b id="w-shards">0</b><i class="dot"></i></span>
+    <span class="cur lvl"><b id="w-level">1</b><small>Lv.</small></span>
+  </div>
+  <div class="live-chip"><i></i>LIVE<span>Season 1 · Harbor Strike</span></div>
+  <div class="dailybox" id="dailybox">
+    <div class="db-title">DAILY BOX</div>
+    <div class="db-art"></div>
+    <div class="db-free" id="db-free">FREE X1</div>
+  </div>
+  <button class="rank-card" id="rank-card"></button>
+  <button class="event-card" id="event-card"></button>
+
+  <div id="nametags"></div>
+  <div class="friend-slot" data-slot="1"><div class="fs-plus"></div><span>ADD FRIEND</span></div>
+  <div class="friend-slot" data-slot="2"><div class="fs-plus"></div><span>ADD FRIEND</span></div>
+  <button class="change-skin" id="btn-skin">CHANGE SKIN<i class="dot"></i></button>
+
+  <div class="party-info">PARTY ID: <b id="party-id">r_xxxx</b><span class="region"><i class="flag"></i>LOCAL<small>Bots</small></span></div>
+  <div class="play-stack">
+    <button class="btn-join" id="btn-custom">CUSTOM MATCH</button>
+    <button class="btn-mode" id="btn-mode"><span class="tri"></span><span><b>SELECT MODE</b><small id="mode-sub">DEATHMATCH</small></span></button>
+    <button class="btn-play" id="btn-play"><span>PLAY</span></button>
+  </div>
+  <div class="community" id="btn-controls"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 7h18v10H3zM6 10h2v2H6zm3 0h2v2H9zm3 0h2v2h-2zm3 0h3v2h-3zM7 13h10v2H7z"/></svg><span><b>CONTROLS</b><small>keyboard</small></span></div>
+  <div class="version">v1.0.0 · stryken</div>
+</div>
+
+<!-- ========== MODALES DEL LOBBY ========== -->
+<div id="modal-root"></div>
+
+<!-- ========== HUD ========== -->
+<div id="hud" class="hidden">
+  <div class="top-score">
+    <div class="ts-box ts-left"><small id="ts-left-l">KILLED</small><b id="ts-left">0</b></div>
+    <div class="ts-time"><i>‹</i><b id="ts-time">05:00</b><i>›</i></div>
+    <div class="ts-box ts-right"><b id="ts-right">30</b><small id="ts-right-l">TARGET</small></div>
+  </div>
+  <div class="chat" id="chat"><div class="chat-log" id="chat-log"></div><input id="chat-input" maxlength="80" autocomplete="off" placeholder="Say something..."><div class="chat-hint">Enter</div></div>
+  <div class="killfeed" id="killfeed"></div>
+  <div class="crosshair" id="crosshair"><i class="ch-t"></i><i class="ch-b"></i><i class="ch-l"></i><i class="ch-r"></i><i class="ch-dot"></i></div>
+  <div class="hitmarker" id="hitmarker"><i></i><i></i><i></i><i></i></div>
+  <div class="scope" id="scope"><div class="scope-ring"></div><i class="sl-h"></i><i class="sl-v"></i></div>
+  <div class="dmg-layer" id="dmg-layer"></div>
+  <div id="v2-nums"></div>
+  <div class="ammo-warn" id="ammo-warn"></div>
+  <div class="hurt" id="hurt"></div>
+  <div id="tags"></div>
+  <div class="killbanner" id="killbanner"></div>
+  <div class="toast-hud" id="toast-hud"></div>
+  <div class="pickup" id="pickup"></div>
+  <div class="shield" id="shield">SPAWN PROTECTION</div>
+  <div class="health"><div class="hp-row"><svg viewBox="0 0 24 24"><path fill="#e8343b" d="M12 21s-7.5-4.6-9.7-9.2C.7 8.4 2.8 4.5 6.5 4.5c2.1 0 3.5 1.1 4.5 2.6 1-1.5 2.4-2.6 4.5-2.6 3.7 0 5.8 3.9 4.2 7.3C19.5 16.4 12 21 12 21z"/></svg><b id="hp">100</b><small>/ 100</small></div><div class="hp-bar" id="hp-bar"></div></div>
+  <div class="actions">
+    <div class="act"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 9h10l3-2h3v3h-3l-1 2H9l-1 3H5l1-3H4zM14 15l3 3 3-3h-2v-3h-2v3z"/></svg><kbd>G</kbd></div>
+    <div class="act"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M9 2h4v3H9zM8 6h6l1 3v12H7V9zM17 5l2-1v1l2 .5-2 .5v1l-2-1zM18 9h1v1h-1zm2 1h1v1h-1z"/></svg><kbd>T</kbd></div>
+    <div class="act"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5c-5 0-9 7-9 7s4 7 9 7 9-7 9-7-4-7-9-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><kbd>V</kbd></div>
+  </div>
+  <div class="slots" id="slots"></div>
+  <div class="ammo"><div class="ammo-name" id="ammo-name">AKR-47</div><div class="ammo-count"><b id="ammo-mag">30</b><span>/</span><small id="ammo-res">120</small></div><div class="reload-bar" id="reload-bar"><i></i></div></div>
+  <div class="fps" id="fps"></div>
+  <div class="scoreboard hidden" id="scoreboard"></div>
+  <div class="death hidden" id="death"></div>
+</div>
+
+<!-- Modales de partida -->
+<div id="loadout" class="overlay hidden"></div>
+<div id="pause" class="overlay hidden"></div>
+<div id="results" class="overlay hidden"></div>
+<div id="click-to-play" class="hidden"><div>CLICK TO PLAY</div><small>ESC · menu &nbsp; B · loadout &nbsp; TAB · scoreboard</small></div>
+<div id="toast"></div>
+<div id="cine-fade"></div><div id="letterbox-t"></div><div id="letterbox-b"></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

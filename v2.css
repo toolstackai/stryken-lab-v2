@@ -1,0 +1,98 @@
+/* =====================================================================
+   STRYKEN LAB V2 — capa visual de la V2 (se carga la última).
+   Skills aplicadas aquí: game-ui-design · game-ui-ux · threejs-game-ui-designer · game-feel.
+   Reglas: números de ancho fijo (nada "baila"), escala del HUD hacia las esquinas, centro despejado,
+   color de enemigo configurable + forma (✕) para daltónicos, texto con contorno legible sobre cualquier fondo.
+   ===================================================================== */
+:root { --enemy: #ff4b4b; --v2-gold: #ffd23a; --v2-cyan: #3fe0ff; --v2-ink: rgba(6, 10, 18, .78); }
+
+/* ---------- Números estables (fixed-width numerals) ---------- */
+#hud .ts-box b, #hud .ts-time b, #hp, #ammo-mag, #ammo-res, .v2n, .ar-money b, .ar-score b { font-variant-numeric: tabular-nums; }
+.ammo-count b { display: inline-block; min-width: 1.15em; text-align: right; }
+
+/* ---------- Escala del HUD: cada grupo crece hacia su borde ---------- */
+#hud { --ui: 1; }
+#hud .health { scale: var(--ui); transform-origin: left bottom; }
+#hud .ammo { scale: var(--ui); transform-origin: right bottom; }
+#hud .slots { scale: var(--ui); transform-origin: right bottom; }
+#hud .killfeed { scale: var(--ui); transform-origin: right top; }
+#hud .top-score { scale: var(--ui); transform-origin: center top; }
+#hud .actions { scale: var(--ui); transform-origin: right center; }
+#hud .chat { scale: var(--ui); transform-origin: left center; }
+
+/* Margen seguro: en pantallas pequeñas el bloque de munición no se sale por la derecha */
+#hud .ammo { right: max(22px, env(safe-area-inset-right)); white-space: nowrap; }
+#hud .health { left: max(22px, env(safe-area-inset-left)); }
+/* El killfeed no puede chocar con el marcador central en pantallas estrechas */
+@media (max-width: 1280px) { #hud .killfeed { top: 58px; } }
+@media (max-width: 1000px) {
+  #hud .ammo-count { font-size: 42px; } #hud .ammo-count small { font-size: 32px; }
+  #hud .slots { bottom: 100px; }
+}
+
+/* ---------- Vida: rastro de daño (la parte perdida se vacía con retraso) ---------- */
+.hp-bar i s { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: #ffb43a; transition: width .45s cubic-bezier(.5, 0, .3, 1) .32s; }
+.hp-bar i b { z-index: 1; }
+.hp-row.low ~ .hp-bar i s { background: #fff; }
+.hp-row.low svg { animation: v2beat .8s ease-in-out infinite; }
+@keyframes v2beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.28); } 30% { transform: scale(1); } 45% { transform: scale(1.14); } }
+
+/* ---------- Números de daño ---------- */
+#v2-nums { position: absolute; inset: 0; overflow: hidden; }
+.v2n { position: absolute; transform: translate(-50%, -50%); font-family: var(--cond); font-weight: 800; font-size: 22px; color: #fff; letter-spacing: .5px;
+  -webkit-text-stroke: 1px rgba(0, 0, 0, .55); text-shadow: 0 2px 0 rgba(0, 0, 0, .55), 0 0 10px rgba(0, 0, 0, .35); pointer-events: none; will-change: left, top, opacity; }
+.v2n.big { font-size: 27px; }
+.v2n.head { color: var(--v2-gold); font-size: 30px; }
+.v2n.kill::after { content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px; border: 2px solid var(--enemy); transform: rotate(45deg); animation: v2killring .5s ease-out forwards; }
+@keyframes v2killring { from { opacity: 1; scale: .5; } to { opacity: 0; scale: 3.4; } }
+
+/* ---------- Hitmarker de baja: anillo que se expande ---------- */
+.hitmarker.kill::after { content: ''; position: absolute; left: -16px; top: -16px; width: 32px; height: 32px; border: 2px solid var(--enemy); border-radius: 50%; animation: v2ring .35s ease-out forwards; }
+@keyframes v2ring { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(1.6); } }
+.hitmarker.kill i { background: var(--enemy); }
+
+/* ---------- Aviso de munición bajo la mira ---------- */
+.ammo-warn { position: absolute; left: 50%; top: calc(50% + 46px); transform: translateX(-50%); }
+.ammo-warn span { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 15px; letter-spacing: 1.5px; color: #fff; padding: 2px 10px;
+  background: var(--v2-ink); clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); animation: v2warn 1s ease-in-out infinite; }
+.ammo-warn span.bad { color: var(--enemy); animation: none; }
+.ammo-warn kbd { font: 700 11px var(--body); padding: 0 5px; border-radius: 3px; background: #fff; color: #111; }
+@keyframes v2warn { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+/* ---------- Color de enemigo (daltonismo) ---------- */
+.tag3d.enemy { color: var(--enemy); } .tag3d.enemy .tb i { background: var(--enemy); }
+.kf .en { color: var(--enemy); } .kf .mine-n { color: var(--v2-gold); }
+.kf { clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%); padding-left: 12px; }
+
+/* ---------- Destello de bordes (game feel) ---------- */
+.v2-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, transparent 55%, var(--fc, rgba(255, 255, 255, .5)) 100%); }
+
+/* ---------- Ajustes: vistas previas nuevas ---------- */
+.pv-hud { position: relative; width: 190px; height: 104px; margin: 0 auto; background: linear-gradient(#5c7a9c, #3a4656); border-radius: 6px; overflow: hidden; }
+.pv-hud i { position: absolute; font: 700 calc(16px * var(--ui)) var(--cond); color: #fff; font-style: normal; text-shadow: 0 1px 2px #000; }
+.pv-hud .pv-hp { left: 8px; bottom: 6px; } .pv-hud .pv-am { right: 8px; bottom: 6px; } .pv-hud .pv-am b { font-size: calc(24px * var(--ui)); }
+.pv-hud .pv-ch { left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px; border: 2px solid #fff; border-radius: 50%; }
+.pv-dmg { display: flex; justify-content: center; gap: 14px; align-items: flex-end; height: 90px; }
+.pv-dmg b { font: 800 24px var(--cond); color: #fff; -webkit-text-stroke: 1px rgba(0, 0, 0, .5); }
+.pv-dmg b.head { color: var(--v2-gold); font-size: 32px; } .pv-dmg b.sm { font-size: 18px; opacity: .8; }
+.pv-dmg.off { align-items: center; font: 800 22px var(--cond); color: #8b95a8; }
+.pv-enemy { display: flex; flex-direction: column; align-items: center; gap: 18px; padding-top: 22px; }
+.pv-enemy .tag3d { position: static; transform: none; color: var(--enemy); } .pv-enemy .tag3d .tb i { background: var(--enemy); }
+.pv-enemy .kf { display: flex; gap: 10px; font: 600 14px var(--body); }
+.pv-enemy .kf .en { color: var(--enemy); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ammo-warn span, .hp-row.low svg { animation: none; }
+}
+
+/* combo de bajas (skill game-designer: texto que crece y entra de golpe) */
+.kb-streak.v2-combo { line-height: .9; animation: v2combo .42s cubic-bezier(.2, 1.7, .4, 1) both; -webkit-text-stroke: 1px rgba(0, 0, 0, .35); }
+@keyframes v2combo { from { transform: scale(2.6) rotate(-6deg); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Ajustes · cuenta / guardado en la nube */
+.st-cloud { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: 360px; }
+.st-cloud p { margin: 0; font: 500 13px/1.4 var(--body); color: #aeb7c7; }
+.st-cloud .btn { font-size: 16px; padding: 6px 18px; }
+.cl-state { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+.cl-state i { width: 10px; height: 10px; border-radius: 50%; background: #8b95a8; }
+.cl-guest i, .cl-google i { background: #7dffa8; box-shadow: 0 0 8px #7dffa8; } .cl-offline i { background: #ff4b4b; } .cl-connecting i { background: #ffd23a; }

@@ -1,0 +1,9 @@
+{
+  "name": "stryken",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python serve.py",
+    "test": "node tests/maps.test.js"
+  }
+}

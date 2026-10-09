@@ -1,0 +1,66 @@
+/* =====================================================================
+   BULLET CAM (V2): rótulos, viñeta, onda de choque, rayos X y viñetas de cómic.
+   ===================================================================== */
+#bc-ui { position: fixed; inset: 0; z-index: 22; pointer-events: none; font-family: var(--cond); color: #fff; }
+body.bc-on #hud, body.bc-on #dk-ui > :not(.dk-grain) { opacity: 0 !important; transition: opacity .2s; }
+body.bc-on .kc-names, body.bc-on .kc-weapon, body.bc-on .kc-slow, body.bc-on .kc-tag, body.bc-on .kc-slam, body.bc-on .kc-grain { opacity: 0 !important; animation: none !important; }
+
+.bc-tag { position: absolute; left: 28px; top: 70px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; letter-spacing: 4px; text-shadow: 0 2px 6px #000; animation: bcIn .4s both; }
+.bc-tag i { width: 9px; height: 9px; border-radius: 50%; background: #ff3b3b; box-shadow: 0 0 10px #ff3b3b; animation: blink 1s infinite; }
+.bc-meter { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); display: flex; align-items: baseline; gap: 6px; text-shadow: 0 3px 10px rgba(0, 0, 0, .8); animation: bcIn .4s .1s both; }
+.bc-meter b { font-size: 54px; font-weight: 900; font-style: italic; font-variant-numeric: tabular-nums; min-width: 2.6em; text-align: right; }
+.bc-meter small { font-size: 22px; font-weight: 800; color: #cfd6e2; }
+.bc-meter span { margin-left: 14px; font-size: 16px; font-weight: 800; letter-spacing: 3px; color: #ffd23a; }
+.bc-speed { position: absolute; right: 28px; top: 70px; font-size: 22px; font-weight: 800; letter-spacing: 1px; font-variant-numeric: tabular-nums; color: #9ff4ff; text-shadow: 0 2px 6px #000; animation: bcIn .4s .15s both; }
+.bc-vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, .55) 100%); }
+#bc-ui.bc-approach .bc-vig { background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, .72) 100%); transition: background .5s; }
+#bc-ui.bc-approach .bc-meter b { color: #ffd23a; }
+#bc-ui.bc-hit .bc-meter, #bc-ui.bc-hit .bc-speed { opacity: 0; transition: opacity .2s; }
+@keyframes bcIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+#bc-ui.bc-short .bc-tag { top: 24px; } #bc-ui.bc-short .bc-speed { top: 24px; }
+/* desaturación ligera del mundo mientras vuela la bala */
+body.bc-on #c { filter: saturate(.75) contrast(1.08); transition: filter .3s; }
+
+/* onda de choque: ondulación de pantalla */
+#bc-ui.bc-shock::after { content: ''; position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px; border-radius: 50%; border: 6px solid rgba(255, 255, 255, .85);
+  box-shadow: 0 0 40px rgba(255, 255, 255, .6), inset 0 0 30px rgba(255, 255, 255, .4); animation: bcShock .65s cubic-bezier(.15, .8, .3, 1) forwards; }
+@keyframes bcShock { from { transform: scale(.2); opacity: 1; } to { transform: scale(30); opacity: 0; border-width: 1px; } }
+
+/* rayos X */
+#bc-ui.bc-xray .bc-vig { background: radial-gradient(ellipse at center, rgba(40, 200, 255, .05) 30%, rgba(0, 30, 50, .78) 100%), repeating-linear-gradient(0deg, rgba(120, 240, 255, .07) 0 2px, transparent 2px 5px); }
+body.bc-on:has(#bc-ui.bc-xray) #c { filter: saturate(.25) brightness(.7) hue-rotate(160deg) contrast(1.2); }
+#bc-ui.bc-xray::before { content: 'X-RAY'; position: absolute; left: 28px; bottom: 96px; font-size: 40px; font-weight: 900; font-style: italic; letter-spacing: 6px; color: #9ff4ff; text-shadow: 0 0 18px rgba(80, 220, 255, .8); animation: bcIn .3s both; }
+#bc-ui.bc-xray.bc-head::after { content: 'HEADSHOT'; position: absolute; right: 28px; bottom: 96px; font-size: 40px; font-weight: 900; font-style: italic; letter-spacing: 4px; color: #ffd23a; text-shadow: 0 0 18px rgba(255, 210, 58, .7); animation: arSlam .5s cubic-bezier(.2, 1.6, .4, 1) .5s both; }
+#bc-ui.bc-crack .bc-vig { animation: bcCrack .25s; }
+@keyframes bcCrack { 0% { filter: brightness(3); } 100% { filter: none; } }
+
+/* fragmentos */
+#bc-ui.bc-shatter::before { content: 'SHATTERED'; position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); font-size: 44px; font-weight: 900; font-style: italic; letter-spacing: 8px; color: #fff; text-shadow: 0 4px 0 rgba(0, 0, 0, .45); animation: arSlam .55s cubic-bezier(.2, 1.6, .4, 1) .25s both; }
+
+/* ---------- CÓMIC ---------- */
+#bc-comic { position: fixed; inset: 0; z-index: 60; pointer-events: none; background: #f3ead2; font-family: var(--cond); overflow: hidden;
+  background-image: radial-gradient(rgba(0, 0, 0, .14) 1.2px, transparent 1.6px); background-size: 9px 9px; animation: cmBg .25s both; }
+@keyframes cmBg { from { opacity: 0; } to { opacity: 1; } }
+.cm-p { position: absolute; background-size: cover; background-position: center; border: 6px solid #111; box-shadow: 8px 8px 0 #111; opacity: 0; filter: contrast(1.35) saturate(1.4); }
+.cm-p::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(0, 0, 0, .22) 1px, transparent 1.5px); background-size: 6px 6px; mix-blend-mode: multiply; }
+.cm-1 { left: 3%; top: 4%; width: 56%; height: 52%; clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%); }
+.cm-2 { right: 3%; top: 4%; width: 37%; height: 52%; clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%); }
+.cm-3 { left: 3%; bottom: 4%; width: 94%; height: 38%; clip-path: polygon(0 6%, 100% 0, 100% 100%, 0 100%); }
+.cm-p.in { animation: cmIn .32s cubic-bezier(.2, 1.5, .4, 1) forwards; }
+@keyframes cmIn { from { opacity: 0; transform: scale(1.25) rotate(-2deg); } to { opacity: 1; transform: none; } }
+.cm-sfx { position: absolute; left: 6%; top: 8%; font-size: clamp(42px, 7vw, 96px); font-weight: 900; font-style: italic; color: #ffd23a; -webkit-text-stroke: 4px #111; paint-order: stroke fill; transform: rotate(-10deg); text-shadow: 5px 5px 0 #d42f35; z-index: 1; }
+.cm-pow { left: auto; right: 8%; top: 10%; color: #fff; text-shadow: 6px 6px 0 #2a6fdc; transform: rotate(8deg); }
+.cm-say { position: absolute; left: 8%; top: 8%; max-width: 70%; padding: 8px 14px; background: #fff; border: 4px solid #111; border-radius: 18px; font-size: clamp(18px, 2.4vw, 30px); font-weight: 900; color: #111; z-index: 1; }
+.cm-say::after { content: ''; position: absolute; left: 30px; bottom: -18px; border: 9px solid transparent; border-top: 14px solid #111; }
+.cm-2 small { position: absolute; left: 8%; bottom: 6%; padding: 2px 10px; background: #111; color: #ffd23a; font-size: 16px; font-weight: 800; letter-spacing: 1px; z-index: 1; }
+.cm-stamp { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%) rotate(-8deg) scale(3); opacity: 0; text-align: center; padding: 10px 34px 12px; border: 8px solid #d42f35; color: #d42f35; background: rgba(243, 234, 210, .88); }
+.cm-stamp b { display: block; font-size: clamp(44px, 8vw, 110px); font-weight: 900; letter-spacing: 6px; line-height: .9; }
+.cm-stamp span { display: block; font-size: clamp(18px, 2.4vw, 30px); font-weight: 800; color: #111; letter-spacing: 2px; }
+#bc-comic.stamp .cm-stamp { animation: cmStamp .38s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+@keyframes cmStamp { to { opacity: 1; transform: translate(-50%, -50%) rotate(-8deg) scale(1); } }
+#bc-comic.out { animation: cmOut .3s forwards; }
+@keyframes cmOut { to { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) { #bc-ui *, #bc-comic * { animation-duration: .01s !important; } }
+#bc-ui.bc-knife .bc-meter b, #bc-ui.bc-knife .bc-meter small, #bc-ui.bc-knife .bc-speed { display: none; }
+#bc-ui.bc-knife .bc-meter span { font-size: 22px; }
